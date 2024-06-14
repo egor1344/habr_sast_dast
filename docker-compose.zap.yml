@@ -1,0 +1,10 @@
+version: '3.8'
+
+
+services:
+
+  zap:
+    image: "ghcr.io/zaproxy/zaproxy:latest"
+    command:  zap-baseline.py -t http://backend:8000/admin/ -r report.html
+#    volumes:
+#      - ./zap:/zap/wrk/report.html:cached

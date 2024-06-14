@@ -1,0 +1,66 @@
+version: '3.8'
+
+
+services:
+
+  backend:
+    restart: no
+    build:
+      context: ./backend
+    volumes:
+      - ./backend/:/app/:cached
+      - static:/app/static/:delegated
+    entrypoint: ./entrypoint.sh
+    command: poetry run python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+      - redis
+    ports:
+      - 8000:8000
+    environment:
+      - DEBUG
+      - API_DOCS_ENABLE
+      - SECRET_KEY
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_NAME
+      - POSTGRES_USER
+
+
+  db:
+    image: postgres:16.3-alpine
+    restart: no
+    environment:
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_NAME
+      - POSTGRES_USER
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    ports:
+      - 15239:5432
+
+  redis:
+    image: redis:7.2-alpine
+    restart: no
+    volumes:
+      - redisdata:/data
+    ports:
+      - 6379:6379
+
+
+  frontend:
+    restart: no
+    build:
+      context: ./frontend
+    volumes:
+      - nuxt:/app/nuxt_volume:delegated
+    ports:
+      - 3000:3000
+
+
+volumes:
+  redisdata:
+  postgresdata:
+  nuxt:
+  static:

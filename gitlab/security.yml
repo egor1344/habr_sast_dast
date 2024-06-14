@@ -1,0 +1,84 @@
+gitleaks:
+  stage: security
+  before_script: [ ]
+  image:
+    name: "zricethezav/gitleaks"
+    entrypoint: [ "" ]
+  script:
+    - gitleaks detect -v ./
+  allow_failure: true
+
+bandit:
+  stage: security
+  before_script: [ ]
+  image:
+    name: "ghcr.io/pycqa/bandit/bandit"
+    entrypoint: [ "" ]
+  script:
+    - gitleaks detect -v ./
+  allow_failure: true
+
+trivy:backend:
+  stage: security
+  before_script: [ ]
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [ "" ]
+  variables:
+    GIT_STRATEGY: none
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: ".trivycache/"
+  script:
+    - time trivy image --clear-cache
+    - time trivy image --download-db-only
+    - time trivy image --exit-code 1 --severity CRITICAL "${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_REF_NAME}"
+  cache:
+    paths:
+      - .trivycache/
+  allow_failure: true
+
+trivy:frontend:
+  stage: security
+  before_script: [ ]
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [ "" ]
+  variables:
+    GIT_STRATEGY: none
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: ".trivycache/"
+  script:
+    - time trivy image --clear-cache
+    - time trivy image --download-db-only
+    - time trivy image --exit-code 1 --severity CRITICAL "${CI_REGISTRY_IMAGE}/frontend:${CI_COMMIT_REF_NAME}"
+  cache:
+    paths:
+      - .trivycache/
+  allow_failure: true
+
+
+trivy:repository:
+  stage: security
+  before_script: [ ]
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [ "" ]
+  variables:
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: ".trivycache/"
+  script:
+    - time trivy image --clear-cache
+    - time trivy fs --exit-code 1 --severity CRITICAL ./
+  cache:
+    paths:
+      - .trivycache/
+  allow_failure: true

@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "Project for example SAST and DAST"
+version = "0.1.0"
+description = "Project for example SAST and DASTt"
+license = "MIT"
+authors=["Egor Ponyavin <ep@idaproject.com>"]
+
+[tool.poetry.dependencies]
+# core
+python = "3.12.*"
+Django = "4.2.*"
+psycopg2-binary = "2.9.*"
+#django-redis = "5.4.*"
+
+# Models \ Admin
+phonenumbers = "^8.12.29"
+django-phonenumber-field = "5.2.*"
+
+# Rest
+djangorestframework = "3.14.*"
+drf-spectacular = "0.24.*"
+django-filter = "22.*"
+
+# Others
+Pillow = "10.0.1"
+
+[tool.poetry.dev-dependencies]
+django-debug-toolbar = "^3.2.1"
+
+# linting
+ruff = "0.0.*"
+
+# Typehinting
+mypy = "1.*"
+mypy-extensions = "1.*"
+django-stubs = "1.14.*"
+djangorestframework-stubs="1.8.*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

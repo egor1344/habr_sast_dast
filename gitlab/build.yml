@@ -1,0 +1,30 @@
+build:backend:
+  stage: build
+  script:
+    - TAG=${CI_COMMIT_REF_SLUG} docker compose -f docker-compose.yml pull backend || true
+    - TAG=${CI_COMMIT_SHA} CACHE_FROM_TAG=${CI_COMMIT_REF_SLUG} docker compose -f docker-compose.yml build backend
+    - TAG=${CI_COMMIT_SHA} docker compose -f docker-compose.yml push backend
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /^(main|develop)$/
+      changes:
+        - backend/**/*
+        - gitlab/build.yml
+        - .gitlab-ci.yml
+        - docker-compose.yml
+
+build:frontend:
+  stage: build
+  script:
+    - TAG=${CI_COMMIT_REF_SLUG} docker compose -f docker-compose.yml pull frontend || true
+    - TAG=${CI_COMMIT_SHA} CACHE_FROM_TAG=${CI_COMMIT_REF_NAME} docker compose -f docker-compose.yml build frontend
+    - TAG=${CI_COMMIT_SHA} docker compose -f docker-compose.yml push frontend
+  environment:
+    name: ${CI_COMMIT_REF_SLUG}
+    url: ${ENVIRONMENT_URL}
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /^(main|develop)$/
+      changes:
+        - frontend/**/*
+        - gitlab/build.yml
+        - .gitlab-ci.yml
+        - docker-compose.yml

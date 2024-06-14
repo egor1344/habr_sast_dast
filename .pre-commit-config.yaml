@@ -1,0 +1,11 @@
+repos:
+- repo: https://github.com/PyCQA/bandit
+  rev: '1.7.8'
+  hooks:
+  - id: bandit
+    args: ["-c", "backend/pyproject.toml"]
+
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.18.3
+  hooks:
+    - id: gitleaks

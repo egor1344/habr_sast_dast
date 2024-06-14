@@ -1,0 +1,15 @@
+default:
+  image: 'docker:23.0-dind'
+
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+
+stages:
+  - build
+  - security
+  - post-deploy
+
+include:
+  - local: '/gitlab/build.yml'
+  - local: '/gitlab/security.yml'
+  - local: '/gitlab/post-deploy.yml'
